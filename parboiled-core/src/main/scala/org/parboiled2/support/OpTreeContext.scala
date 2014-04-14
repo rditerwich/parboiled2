@@ -82,9 +82,9 @@ trait OpTreeContext[OpTreeCtx <: Parser.ParserContext] {
     case q"$a.this.drop[$b]($hl)"                          ⇒ DropAction(hl)
     case q"$a.this.runSubParser[$b, $c]($f)"               ⇒ RunSubParser(f)
     case x @ q"$a.this.str2CharRangeSupport($l).-($r)"     ⇒ CharRange(l, r)
-    case q"$a.this.charAndValue[$t]($b.any2ArrowAssoc[$t1]($c).->[$t2]($v))($hl)" ⇒
+    case q"$a.this.charAndValue[$t]($b.ArrowAssoc[$t1]($c).->[$t2]($v))($hl)" ⇒
       Sequence(CharMatch(c), PushAction(v, hl))
-    case q"$a.this.stringAndValue[$t]($b.any2ArrowAssoc[$t1]($s).->[$t2]($v))($hl)" ⇒
+    case q"$a.this.stringAndValue[$t]($b.ArrowAssoc[$t1]($s).->[$t2]($v))($hl)" ⇒
       Sequence(StringMatch(s), PushAction(v, hl))
     case q"$a.this.rule2ActionOperator[$b1, $b2]($r)($o).~>.apply[..$e]($f)($g, support.this.FCapture.apply[$ts])" ⇒
       Sequence(OpTree(r), Action(f, ts))
@@ -581,8 +581,8 @@ trait OpTreeContext[OpTreeCtx <: Parser.ParserContext] {
           case x ⇒ c.abort(x.pos, "Illegal runSubParser expr: " + show(x))
         }
 
-      val q"($arg ⇒ $body)" = fTree
-      rewrite(arg.name, c.resetAllAttrs(body))
+      val q"($arg ⇒ $body)" = c.resetLocalAttrs(fTree)
+      rewrite(arg.name, body)
     }
   }
 
